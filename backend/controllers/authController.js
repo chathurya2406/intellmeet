@@ -1,158 +1,185 @@
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-
-
 const {
   generateAccessToken,
   generateRefreshToken,
 } = require("../utils/generateToken");
 
 
-// Signup
+// SIGNUP
 const signup = async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
-    // Check existing user
     const existingUser = await User.findOne({ email });
-
     if (existingUser) {
       return res.status(400).json({
+        success: false,
         message: "User already exists",
       });
     }
 
-    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create user
     const user = await User.create({
       name,
       email,
       password: hashedPassword,
     });
 
-    // Generate tokens
     const accessToken = generateAccessToken(user._id);
     const refreshToken = generateRefreshToken(user._id);
 
-    // Save refresh token
     user.refreshToken = refreshToken;
     await user.save();
 
     res.status(201).json({
+      success: true,
       message: "User registered successfully",
       accessToken,
       refreshToken,
     });
-
   } catch (error) {
     res.status(500).json({
-      message: error.message,
+      success: false,
+      message: error?.message || "Signup failed",
     });
   }
 };
 
 
-// Login
+// LOGIN
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Find user
     const user = await User.findOne({ email });
 
     if (!user) {
       return res.status(400).json({
+        success: false,
         message: "Invalid credentials",
       });
     }
 
-    // Compare password
-    const isMatch = await bcrypt.compare(
-      password,
-      user.password
-    );
+    const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
       return res.status(400).json({
+        success: false,
         message: "Invalid credentials",
       });
     }
 
-    // Generate tokens
     const accessToken = generateAccessToken(user._id);
-
     const refreshToken = generateRefreshToken(user._id);
 
-    // Save refresh token
     user.refreshToken = refreshToken;
     await user.save();
 
     res.status(200).json({
+      success: true,
       message: "Login successful",
       accessToken,
       refreshToken,
     });
-
   } catch (error) {
     res.status(500).json({
-      message: error.message,
+      success: false,
+      message: error?.message || "Login failed",
     });
   }
 };
 
-// Protected Profile Route
+
+// PROFILE
 const getProfile = async (req, res) => {
   res.status(200).json({
-    message: "Protected profile route",
+    success: true,
     user: req.user,
   });
 };
 
 
-// Refresh Access Token
+// UPDATE PROFILE
+const updateProfile = async (req, res) => {
+  try {
+    const { name, bio, phone } = req.body;
+
+    const user = await User.findById(req.user._id);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    if (name) user.name = name;
+    if (bio) user.bio = bio;
+    if (phone) user.phone = phone;
+
+    if (req.file?.path) {
+      user.avatar = req.file.path;
+    }
+
+
+
+    const updatedUser = await user.save();
+    console.log("BODY:", req.body);
+    console.log("FILE:", req.file);
+    console.log("USER:", req.user);
+
+    res.status(200).json({
+      success: true,
+      message: "Profile updated successfully",
+      user: updatedUser,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error?.message || "Update failed",
+    });
+  }
+};
+
+
+// REFRESH TOKEN
 const refreshAccessToken = async (req, res) => {
   try {
     const { refreshToken } = req.body;
 
-    if (!refreshToken) {
-      return res.status(401).json({
-        message: "Refresh token required",
-      });
-    }
-
-    // Verify refresh token
     const decoded = jwt.verify(
       refreshToken,
       process.env.REFRESH_TOKEN_SECRET
     );
 
-    // Find user
     const user = await User.findById(decoded.id);
 
     if (!user || user.refreshToken !== refreshToken) {
       return res.status(403).json({
+        success: false,
         message: "Invalid refresh token",
       });
     }
 
-    // Generate new access token
     const newAccessToken = generateAccessToken(user._id);
 
     res.status(200).json({
+      success: true,
       accessToken: newAccessToken,
     });
-
   } catch (error) {
     res.status(403).json({
-      message: "Refresh token expired or invalid",
+      success: false,
+      message: "Token expired or invalid",
     });
   }
 };
 
-// Logout
+
+// LOGOUT
 const logout = async (req, res) => {
   try {
     const { refreshToken } = req.body;
@@ -165,20 +192,23 @@ const logout = async (req, res) => {
     }
 
     res.status(200).json({
+      success: true,
       message: "Logged out successfully",
     });
-
   } catch (error) {
     res.status(500).json({
-      message: error.message,
+      success: false,
+      message: error?.message || "Logout failed",
     });
   }
 };
+
 
 module.exports = {
   signup,
   login,
   getProfile,
+  updateProfile,
   refreshAccessToken,
   logout,
 };
