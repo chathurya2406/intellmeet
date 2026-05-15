@@ -5,11 +5,14 @@ require("dotenv").config();
 
 const connectDB = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
+const meetingRoutes = require("./routes/meetingRoutes");
+const { connectRedis } = require("./config/redis");
 
 const app = express();
 
 // Connect Database
 connectDB();
+connectRedis();
 
 // Middleware
 app.use(cors());
@@ -18,6 +21,7 @@ app.use(helmet());
 
 // Routes
 app.use("/api/auth", authRoutes);
+app.use("/api/meetings", meetingRoutes);
 
 // Test Route
 app.get("/", (req, res) => {
