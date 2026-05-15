@@ -7,6 +7,7 @@ const connectDB = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
 const meetingRoutes = require("./routes/meetingRoutes");
 const { connectRedis } = require("./config/redis");
+const chatRoutes = require("./routes/chatRoutes");
 
 const app = express();
 
@@ -22,6 +23,7 @@ app.use(helmet());
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/meetings", meetingRoutes);
+app.use("/api/chat", chatRoutes);
 
 // Test Route
 app.get("/", (req, res) => {
