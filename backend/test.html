@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>IntellMeet Socket Test</title>
+</head>
+<body>
+
+<h2>Socket.io Test</h2>
+
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+
+<script>
+  const socket = io("http://localhost:5000");
+
+  socket.on("connect", () => {
+    console.log("Connected:", socket.id);
+
+    socket.emit("join-room", "room123", "user1");
+  });
+
+  socket.on("user-joined", (data) => {
+    console.log("User joined:", data);
+  });
+</script>
+
+</body>
+</html>
