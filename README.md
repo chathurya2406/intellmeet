@@ -11,10 +11,12 @@ backend/
 ├── config/
 │   ├── db.js
 │   └── cloudinary.js
+│   └── redis.js
 │
 ├── controllers/
 │   ├── authController.js
 │   └── meetingController.js
+│   └── chatController.js
 │
 ├── middleware/
 │   └── authMiddleware.js
@@ -22,12 +24,15 @@ backend/
 ├── models/
 │   ├── User.js
 │   └── Meeting.js
-│
+│   └── Chat.js
+│  
 ├── routes/
 │   ├── authRoutes.js
 │   └── meetingRoutes.js
+│   └── chatRoutes.js
 │
 ├── utils/
+│   └──generateToken.js
 │
 ├── server.js
 ├── package.json
