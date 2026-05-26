@@ -1,63 +1,71 @@
 import React, { useState } from "react";
+
 import { useNavigate } from "react-router-dom";
 
 function Home() {
-  const [name, setName] = useState("");
-  const [roomId, setRoomId] = useState("");
 
   const navigate = useNavigate();
 
+  const [name, setName] = useState("");
+
+  const [roomId, setRoomId] =
+    useState("");
+
   const joinMeeting = () => {
-    if (name.trim() === "" || roomId.trim() === "") {
-      alert("Please enter Name and Room ID");
+
+    if (!name || !roomId) {
+
+      alert("Enter name and room ID");
+
       return;
     }
 
-    navigate(`/room/${roomId}`, {
+    navigate(`/meeting/${roomId}`, {
       state: { name },
     });
   };
 
   return (
-    <div style={{ textAlign: "center", marginTop: "100px" }}>
-      <h1>IntellMeet </h1>
 
-      <input
-        type="text"
-        placeholder="Enter Your Name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        style={{
-          padding: "10px",
-          width: "250px",
-          marginBottom: "10px",
-        }}
-      />
+    <div className="min-h-screen bg-slate-950 text-white flex flex-col justify-center items-center">
 
-      <br />
+      <h1 className="text-4xl font-bold mb-8">
 
-      <input
-        type="text"
-        placeholder="Enter Room ID"
-        value={roomId}
-        onChange={(e) => setRoomId(e.target.value)}
-        style={{
-          padding: "10px",
-          width: "250px",
-          marginTop: "10px",
-          marginRight: "10px",
-        }}
-      />
+        IntellMeet
 
-      <button
-        onClick={joinMeeting}
-        style={{
-          padding: "10px 20px",
-          cursor: "pointer",
-        }}
-      >
-        Join Meeting
-      </button>
+      </h1>
+
+      <div className="bg-slate-900 p-8 rounded-xl flex flex-col gap-4 w-96">
+
+        <input
+          type="text"
+          placeholder="Enter your name"
+          value={name}
+          onChange={(e) =>
+            setName(e.target.value)
+          }
+          className="p-3 rounded bg-slate-800"
+        />
+
+        <input
+          type="text"
+          placeholder="Enter room ID"
+          value={roomId}
+          onChange={(e) =>
+            setRoomId(e.target.value)
+          }
+          className="p-3 rounded bg-slate-800"
+        />
+
+        <button
+          onClick={joinMeeting}
+          className="bg-blue-600 p-3 rounded-lg"
+        >
+          Join Meeting
+        </button>
+
+      </div>
+
     </div>
   );
 }

@@ -1,22 +1,55 @@
 import React from "react";
-import { Routes, Route } from "react-router-dom";
-import Home from "./pages/Home";
 
-function MeetingRoom() {
-  return (
-    <div style={{ textAlign: "center", marginTop: "100px" }}>
-      <h2>Meeting Room</h2>
-      <p>Coming soon...</p>
-    </div>
-  );
-}
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+} from "react-router-dom";
+
+import Home from "./pages/Home";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Dashboard from "./pages/Dashboard";
+import MeetingRoom from "./pages/MeetingRoom";
+import MeetingHistory from "./pages/MeetingHistory";
 
 function App() {
   return (
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/room/:roomId" element={<MeetingRoom />} />
-    </Routes>
+    <BrowserRouter>
+      <Routes>
+
+        <Route
+          path="/"
+          element={<Home />}
+        />
+
+        <Route
+          path="/login"
+          element={<Login />}
+        />
+
+        <Route
+          path="/register"
+          element={<Register />}
+        />
+
+        <Route
+          path="/dashboard"
+          element={<Dashboard />}
+        />
+
+        <Route
+          path="/meeting/:roomId"
+          element={<MeetingRoom />}
+        />
+
+        <Route
+         path="/history"
+         element={<MeetingHistory />}
+        />
+
+      </Routes>
+    </BrowserRouter>
   );
 }
 
