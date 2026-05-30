@@ -19,33 +19,37 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "20"
+          cache: "npm"
+          cache-dependency-path: backend/package-lock.json
 
       - name: Install backend dependencies
-        run: |
-          cd backend
-          npm install
+        run: npm ci
+        working-directory: backend
 
       - name: Run backend lint
-        run: |
-          cd backend
-          npm run lint
+        run: npm run lint
+        working-directory: backend
 
       - name: Run backend tests
-        run: |
-          cd backend
-          npm test
+        run: npm test
+        working-directory: backend
+        env:
+          NODE_ENV: test
+          JWT_SECRET: ci-test-jwt-secret-not-for-production-use
+          REFRESH_TOKEN_SECRET: ci-test-refresh-secret-not-for-production-use
 
       - name: Install frontend dependencies
-        run: |
-          cd frontend
-          npm install
+        run: npm ci
+        working-directory: frontend
 
       - name: Run frontend lint
-        run: |
-          cd frontend
-          npm run lint
+        run: npm run lint
+        working-directory: frontend
+
+      - name: Build frontend
+        run: npm run build
+        working-directory: frontend
 
       - name: Audit backend dependencies
-        run: |
-          cd backend
-          npm audit --audit-level=moderate || true
+        run: npm audit --audit-level=moderate || true
+        working-directory: backend
