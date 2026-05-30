@@ -130,7 +130,7 @@ router.delete("/:messageId", async (req, res, next) => {
     await Message.findByIdAndDelete(messageId);
 
     await writeAuditLog({
-      action: "CHAT_MESSAGE_DELETED",
+      action: "CHAT_MESSAGE",
       req,
       userId: req.user.id,
       meetingId,
