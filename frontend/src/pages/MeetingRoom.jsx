@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useAuth } from "../context/useAuth";
+import { useAuth } from "../context/AuthContext";
 import { createSocket, disconnectSocket } from "../socket/socket";
 import VideoCard from "../components/VideoCard";
 import Controls from "../components/Controls";

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 
 const ChatBox = ({ messages, sendMessage, currentUser }) => {
   const [text, setText] = useState("");

@@ -1,5 +1,6 @@
-import { useState, useEffect, useCallback } from "react";
-import { AuthContext } from "./AuthContextValue";
+import { createContext, useContext, useState, useEffect, useCallback } from "react";
+
+const AuthContext = createContext(null);
 
 const API = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 
@@ -8,7 +9,6 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(() => localStorage.getItem("token"));
   const [loading, setLoading] = useState(true);
 
-  // Persist token to localStorage whenever it changes
   useEffect(() => {
     if (token) {
       localStorage.setItem("token", token);
@@ -17,7 +17,6 @@ export const AuthProvider = ({ children }) => {
     }
   }, [token]);
 
-  // refreshToken — declared BEFORE the verify effect that calls it
   const refreshToken = useCallback(async () => {
     try {
       const res = await fetch(`${API}/api/auth/refresh`, {
@@ -47,7 +46,6 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
-  // On mount, verify the stored token is still valid
   useEffect(() => {
     const verify = async () => {
       if (!token) { setLoading(false); return; }
@@ -111,7 +109,6 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   }, [token]);
 
-  // Authenticated fetch helper — auto-attaches Bearer token
   const authFetch = useCallback(async (url, options = {}) => {
     const headers = {
       "Content-Type": "application/json",
@@ -137,4 +134,11 @@ export const AuthProvider = ({ children }) => {
       {children}
     </AuthContext.Provider>
   );
+};
+
+// eslint-disable-next-line react-refresh/only-export-components
+export const useAuth = () => {
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error("useAuth must be used inside AuthProvider");
+  return ctx;
 };

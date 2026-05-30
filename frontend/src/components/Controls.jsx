@@ -1,4 +1,3 @@
-import React from "react";
 import { Mic, MicOff, Video, VideoOff, Monitor, MonitorOff, PhoneOff } from "lucide-react";
 
 const Controls = ({ toggleMic, toggleCamera, shareScreen, leaveMeeting, micOn = true, camOn = true, isScreenSharing = false }) => {

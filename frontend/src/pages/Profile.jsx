@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useAuth } from "../context/useAuth";
+import { useAuth } from "../context/AuthContext";
 import Navbar from "../components/Navbar";
 
 const Profile = () => {
