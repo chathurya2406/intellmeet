@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: intellmeet-backend
+  namespace: intellmeet
+  labels:
+    app: intellmeet-backend
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: intellmeet-backend
+  template:
+    metadata:
+      labels:
+        app: intellmeet-backend
+    spec:
+      containers:
+        - name: backend
+          image: intellmeet-backend:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5000
+          envFrom:
+            - configMapRef:
+                name: intellmeet-config
+            - secretRef:
+                name: intellmeet-secrets
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 3
+            successThreshold: 1
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 20
+            periodSeconds: 20
+            failureThreshold: 3
+            timeoutSeconds: 5
+          startupProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            failureThreshold: 10
+            periodSeconds: 5
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+      restartPolicy: Always

@@ -1,0 +1,41 @@
+# ─── Dependencies ─────────────────────────────────────────────────────────────
+node_modules/
+**/node_modules/
+
+# ─── Environment variables (NEVER commit secrets) ─────────────────────────────
+.env
+.env.local
+.env.production
+backend/.env
+frontend/.env
+
+# ─── Build output ─────────────────────────────────────────────────────────────
+dist/
+build/
+frontend/dist/
+
+# ─── Test coverage ────────────────────────────────────────────────────────────
+coverage/
+backend/coverage/
+*.lcov
+
+# ─── Logs ─────────────────────────────────────────────────────────────────────
+*.log
+backend-server.log
+frontend-server.log
+backend/backend-err.log
+backend/backend-out.log
+
+# ─── Load test results ────────────────────────────────────────────────────────
+loadtests/results/
+
+# ─── OS / Editor ──────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.vscode/
+*.docx
+~$*
+
+# ─── Misc ─────────────────────────────────────────────────────────────────────
+.cache/
+*.tmp

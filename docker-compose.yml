@@ -1,0 +1,78 @@
+version: "3.9"
+
+services:
+  # ── MongoDB ──────────────────────────────────────────────────────────────────
+  mongo:
+    image: mongo:7.0
+    restart: unless-stopped
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    networks:
+      - intellmeet
+
+  # ── Backend ───────────────────────────────────────────────────────────────────
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: intellmeet-backend:latest
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      - PORT=5000
+      - NODE_ENV=production
+      - MONGO_URI=mongodb://mongo:27017/intellmeet
+      - JWT_SECRET=${JWT_SECRET:?JWT_SECRET is required}
+      - REFRESH_TOKEN_SECRET=${REFRESH_TOKEN_SECRET:?REFRESH_TOKEN_SECRET is required}
+      - JWT_EXPIRES_IN=${JWT_EXPIRES_IN:-15m}
+      - REFRESH_TOKEN_EXPIRES_IN=${REFRESH_TOKEN_EXPIRES_IN:-7d}
+      - FRONTEND_URL=${FRONTEND_URL:-http://localhost:3000}
+      - SENTRY_DSN=${SENTRY_DSN:-}
+    depends_on:
+      mongo:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    networks:
+      - intellmeet
+
+  # ── Frontend ──────────────────────────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_BACKEND_URL: ${VITE_BACKEND_URL:-http://localhost:5000}
+    image: intellmeet-frontend:latest
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:80"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    networks:
+      - intellmeet
+
+networks:
+  intellmeet:
+    driver: bridge
+
+volumes:
+  mongo_data:
+    driver: local

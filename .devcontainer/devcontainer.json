@@ -1,0 +1,19 @@
+{
+  "name": "IntelliMeet Dev Container",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:0-20",
+  "workspaceFolder": "/workspace",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
+  "postCreateCommand": "cd backend && npm install && cd ../frontend && npm install",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "ms-azuretools.vscode-docker"
+      ]
+    }
+  },
+  "settings": {
+    "terminal.integrated.defaultProfile.linux": "bash"
+  }
+}

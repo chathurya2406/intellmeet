@@ -1,0 +1,300 @@
+{
+  "__inputs": [{ "name": "DS_PROMETHEUS", "label": "Prometheus", "type": "datasource", "pluginId": "prometheus" }],
+  "__requires": [{ "type": "grafana", "id": "grafana", "name": "Grafana", "version": "10.0.0" }],
+  "annotations": { "list": [] },
+  "description": "IntellMeet Backend — API, Meetings, Users, Resources",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+      "id": 100,
+      "title": "Overview",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] },
+          "unit": "short"
+        }
+      },
+      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 1 },
+      "id": 1,
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "orientation": "auto", "textMode": "auto", "colorMode": "background" },
+      "title": "Active Meetings",
+      "type": "stat",
+      "targets": [{ "expr": "intellmeet_active_meetings", "legendFormat": "Active Meetings", "refId": "A" }]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "blue", "value": null }] },
+          "unit": "short"
+        }
+      },
+      "gridPos": { "h": 4, "w": 4, "x": 4, "y": 1 },
+      "id": 2,
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background" },
+      "title": "Connected Users",
+      "type": "stat",
+      "targets": [{ "expr": "intellmeet_active_users", "legendFormat": "Active Users", "refId": "A" }]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 200 }, { "color": "red", "value": 500 }] },
+          "unit": "ms"
+        }
+      },
+      "gridPos": { "h": 4, "w": 4, "x": 8, "y": 1 },
+      "id": 3,
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background" },
+      "title": "P95 Response Time",
+      "type": "stat",
+      "targets": [{ "expr": "histogram_quantile(0.95, sum(rate(intellmeet_http_request_duration_seconds_bucket[5m])) by (le)) * 1000", "legendFormat": "P95", "refId": "A" }]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 0.01 }, { "color": "red", "value": 0.05 }] },
+          "unit": "percentunit"
+        }
+      },
+      "gridPos": { "h": 4, "w": 4, "x": 12, "y": 1 },
+      "id": 4,
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background" },
+      "title": "Error Rate",
+      "type": "stat",
+      "targets": [{ "expr": "sum(rate(intellmeet_http_requests_total{status=~\"5..\"}[5m])) / sum(rate(intellmeet_http_requests_total[5m]))", "legendFormat": "Error Rate", "refId": "A" }]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] },
+          "unit": "reqps"
+        }
+      },
+      "gridPos": { "h": 4, "w": 4, "x": 16, "y": 1 },
+      "id": 5,
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background" },
+      "title": "Request Rate",
+      "type": "stat",
+      "targets": [{ "expr": "sum(rate(intellmeet_http_requests_total[1m]))", "legendFormat": "Req/s", "refId": "A" }]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] },
+          "unit": "bytes"
+        }
+      },
+      "gridPos": { "h": 4, "w": 4, "x": 20, "y": 1 },
+      "id": 6,
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background" },
+      "title": "Heap Used",
+      "type": "stat",
+      "targets": [{ "expr": "nodejs_heap_size_used_bytes", "legendFormat": "Heap Used", "refId": "A" }]
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 5 },
+      "id": 101,
+      "title": "API Monitoring",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": {
+        "defaults": { "color": { "mode": "palette-classic" }, "unit": "reqps" },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 6 },
+      "id": 10,
+      "options": { "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom" }, "tooltip": { "mode": "multi" } },
+      "title": "HTTP Request Rate by Route",
+      "type": "timeseries",
+      "targets": [
+        { "expr": "sum(rate(intellmeet_http_requests_total[1m])) by (route)", "legendFormat": "{{route}}", "refId": "A" }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": {
+        "defaults": { "color": { "mode": "palette-classic" }, "unit": "ms" },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 6 },
+      "id": 11,
+      "options": { "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom" }, "tooltip": { "mode": "multi" } },
+      "title": "Response Time Percentiles",
+      "type": "timeseries",
+      "targets": [
+        { "expr": "histogram_quantile(0.50, sum(rate(intellmeet_http_request_duration_seconds_bucket[5m])) by (le)) * 1000", "legendFormat": "P50", "refId": "A" },
+        { "expr": "histogram_quantile(0.95, sum(rate(intellmeet_http_request_duration_seconds_bucket[5m])) by (le)) * 1000", "legendFormat": "P95", "refId": "B" },
+        { "expr": "histogram_quantile(0.99, sum(rate(intellmeet_http_request_duration_seconds_bucket[5m])) by (le)) * 1000", "legendFormat": "P99", "refId": "C" }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": {
+        "defaults": { "color": { "mode": "palette-classic" }, "unit": "reqps" },
+        "overrides": [{ "matcher": { "id": "byName", "options": "5xx" }, "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }] }]
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 14 },
+      "id": 12,
+      "options": { "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom" }, "tooltip": { "mode": "multi" } },
+      "title": "HTTP Status Codes",
+      "type": "timeseries",
+      "targets": [
+        { "expr": "sum(rate(intellmeet_http_requests_total{status=~\"2..\"}[1m]))", "legendFormat": "2xx", "refId": "A" },
+        { "expr": "sum(rate(intellmeet_http_requests_total{status=~\"4..\"}[1m]))", "legendFormat": "4xx", "refId": "B" },
+        { "expr": "sum(rate(intellmeet_http_requests_total{status=~\"5..\"}[1m]))", "legendFormat": "5xx", "refId": "C" }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": {
+        "defaults": { "color": { "mode": "palette-classic" }, "unit": "reqps" }
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 14 },
+      "id": 13,
+      "options": { "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom" } },
+      "title": "Auth API Request Rate",
+      "type": "timeseries",
+      "targets": [
+        { "expr": "sum(rate(intellmeet_http_requests_total{route=~\"/api/auth.*\"}[1m])) by (route, method)", "legendFormat": "{{method}} {{route}}", "refId": "A" }
+      ]
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 22 },
+      "id": 102,
+      "title": "Meeting Analytics",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": {
+        "defaults": { "color": { "mode": "palette-classic" }, "unit": "short" }
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 23 },
+      "id": 20,
+      "options": { "legend": { "calcs": ["mean", "max", "last"], "displayMode": "table", "placement": "bottom" } },
+      "title": "Active Meetings & Users Over Time",
+      "type": "timeseries",
+      "targets": [
+        { "expr": "intellmeet_active_meetings", "legendFormat": "Active Meetings", "refId": "A" },
+        { "expr": "intellmeet_active_users", "legendFormat": "Connected Users", "refId": "B" }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": {
+        "defaults": { "color": { "mode": "palette-classic" }, "unit": "reqps" }
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 23 },
+      "id": 21,
+      "options": { "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom" } },
+      "title": "Meeting API Request Rate",
+      "type": "timeseries",
+      "targets": [
+        { "expr": "sum(rate(intellmeet_http_requests_total{route=~\"/api/meetings.*\"}[1m])) by (route, method)", "legendFormat": "{{method}} {{route}}", "refId": "A" }
+      ]
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 31 },
+      "id": 103,
+      "title": "Resource Monitoring",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": {
+        "defaults": { "color": { "mode": "palette-classic" }, "unit": "bytes" }
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 32 },
+      "id": 30,
+      "options": { "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom" } },
+      "title": "Node.js Memory",
+      "type": "timeseries",
+      "targets": [
+        { "expr": "nodejs_heap_size_used_bytes", "legendFormat": "Heap Used", "refId": "A" },
+        { "expr": "nodejs_heap_size_total_bytes", "legendFormat": "Heap Total", "refId": "B" },
+        { "expr": "nodejs_external_memory_bytes", "legendFormat": "External", "refId": "C" }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": {
+        "defaults": { "color": { "mode": "palette-classic" }, "unit": "short" }
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 32 },
+      "id": 31,
+      "options": { "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom" } },
+      "title": "Event Loop & GC",
+      "type": "timeseries",
+      "targets": [
+        { "expr": "rate(nodejs_gc_duration_seconds_sum[1m])", "legendFormat": "GC Duration/s", "refId": "A" },
+        { "expr": "nodejs_eventloop_lag_seconds * 1000", "legendFormat": "Event Loop Lag (ms)", "refId": "B" }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": {
+        "defaults": { "color": { "mode": "palette-classic" }, "unit": "short" }
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 40 },
+      "id": 32,
+      "options": { "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom" } },
+      "title": "Active Handles & Requests",
+      "type": "timeseries",
+      "targets": [
+        { "expr": "nodejs_active_handles_total", "legendFormat": "Active Handles", "refId": "A" },
+        { "expr": "nodejs_active_requests_total", "legendFormat": "Active Requests", "refId": "B" }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": {
+        "defaults": { "color": { "mode": "palette-classic" }, "unit": "short" }
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 40 },
+      "id": 33,
+      "options": { "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom" } },
+      "title": "Process CPU & Uptime",
+      "type": "timeseries",
+      "targets": [
+        { "expr": "rate(process_cpu_seconds_total[1m]) * 100", "legendFormat": "CPU %", "refId": "A" },
+        { "expr": "process_uptime_seconds / 3600", "legendFormat": "Uptime (hours)", "refId": "B" }
+      ]
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 38,
+  "tags": ["intellmeet", "backend", "nodejs"],
+  "templating": { "list": [] },
+  "time": { "from": "now-1h", "to": "now" },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "IntellMeet Backend",
+  "uid": "intellmeet-backend-v2",
+  "version": 2
+}

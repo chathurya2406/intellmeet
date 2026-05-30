@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test-and-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install backend dependencies
+        run: |
+          cd backend
+          npm install
+
+      - name: Run backend lint
+        run: |
+          cd backend
+          npm run lint
+
+      - name: Run backend tests
+        run: |
+          cd backend
+          npm test
+
+      - name: Install frontend dependencies
+        run: |
+          cd frontend
+          npm install
+
+      - name: Run frontend lint
+        run: |
+          cd frontend
+          npm run lint
+
+      - name: Audit backend dependencies
+        run: |
+          cd backend
+          npm audit --audit-level=moderate || true
