@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/useAuth";
 import { createSocket, disconnectSocket } from "../socket/socket";
 import VideoCard from "../components/VideoCard";
 import Controls from "../components/Controls";
@@ -183,7 +183,7 @@ const MeetingRoom = () => {
 
       // ── WebRTC: new user joined — we initiate the offer ───────────────────
 
-      socket.on("user-joined", async ({ userId: _uid, name, socketId: remoteSocketId }) => {
+      socket.on("user-joined", async ({ socketId: remoteSocketId, name }) => {
         if (!mounted) return;
         // Update remote stream name placeholder
         setRemoteStreams((prev) => ({
@@ -252,7 +252,7 @@ const MeetingRoom = () => {
 
       // ── User left ─────────────────────────────────────────────────────────
 
-      socket.on("user-left", ({ userId: _uid, name: _name, socketId: remoteSocketId }) => {
+      socket.on("user-left", ({ socketId: remoteSocketId }) => {
         if (!mounted) return;
         if (remoteSocketId) closePeerConnection(remoteSocketId);
       });
@@ -266,8 +266,10 @@ const MeetingRoom = () => {
 
     return () => {
       mounted = false;
-      // Close all peer connections
-      Object.keys(peerConnections.current).forEach(closePeerConnection);
+      // Snapshot the peer connections map before async cleanup
+      const pcs = { ...peerConnections.current };
+      Object.values(pcs).forEach((pc) => pc.close());
+      peerConnections.current = {};
       // Stop local media tracks
       if (localStreamRef.current) {
         localStreamRef.current.getTracks().forEach((t) => t.stop());
@@ -343,7 +345,7 @@ const MeetingRoom = () => {
       }
 
       // When user stops screen share via browser UI
-      screenTrack.onended = () => shareScreen();
+      screenTrack.onended = () => setIsScreenSharing(false);
       setIsScreenSharing(true);
     } catch (err) {
       console.error("[screen] getDisplayMedia failed:", err);

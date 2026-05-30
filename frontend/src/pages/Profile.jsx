@@ -1,9 +1,9 @@
-import React, { useState } from "react";
-import { useAuth } from "../context/AuthContext";
+import { useState } from "react";
+import { useAuth } from "../context/useAuth";
 import Navbar from "../components/Navbar";
 
 const Profile = () => {
-  const { user, authFetch, login } = useAuth();
+  const { user, authFetch } = useAuth();
 
   const [name, setName] = useState(user?.name || "");
   const [avatar, setAvatar] = useState(user?.avatar || "");

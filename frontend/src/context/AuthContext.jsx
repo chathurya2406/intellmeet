@@ -1,6 +1,5 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
-
-const AuthContext = createContext(null);
+import { useState, useEffect, useCallback } from "react";
+import { AuthContext } from "./AuthContextValue";
 
 const API = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 
@@ -18,31 +17,7 @@ export const AuthProvider = ({ children }) => {
     }
   }, [token]);
 
-  // On mount, verify the stored token is still valid
-  useEffect(() => {
-    const verify = async () => {
-      if (!token) { setLoading(false); return; }
-      try {
-        const res = await fetch(`${API}/api/auth/profile`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (res.ok) {
-          const data = await res.json();
-          setUser(data.user);
-        } else {
-          // Token invalid — try refresh
-          await refreshToken();
-        }
-      } catch {
-        setToken(null);
-        setUser(null);
-      } finally {
-        setLoading(false);
-      }
-    };
-    verify();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
+  // refreshToken — declared BEFORE the verify effect that calls it
   const refreshToken = useCallback(async () => {
     try {
       const res = await fetch(`${API}/api/auth/refresh`, {
@@ -52,7 +27,6 @@ export const AuthProvider = ({ children }) => {
       if (res.ok) {
         const data = await res.json();
         setToken(data.token);
-        // Fetch profile with new token
         const profileRes = await fetch(`${API}/api/auth/profile`, {
           headers: { Authorization: `Bearer ${data.token}` },
         });
@@ -72,6 +46,30 @@ export const AuthProvider = ({ children }) => {
       return null;
     }
   }, []);
+
+  // On mount, verify the stored token is still valid
+  useEffect(() => {
+    const verify = async () => {
+      if (!token) { setLoading(false); return; }
+      try {
+        const res = await fetch(`${API}/api/auth/profile`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setUser(data.user);
+        } else {
+          await refreshToken();
+        }
+      } catch {
+        setToken(null);
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+    verify();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const login = useCallback(async (email, password) => {
     const res = await fetch(`${API}/api/auth/login`, {
@@ -122,15 +120,13 @@ export const AuthProvider = ({ children }) => {
     };
     const res = await fetch(`${API}${url}`, { ...options, headers, credentials: "include" });
     if (res.status === 401) {
-      // Try refresh once
       const newToken = await refreshToken();
       if (newToken) {
-        const retryRes = await fetch(`${API}${url}`, {
+        return fetch(`${API}${url}`, {
           ...options,
           headers: { ...headers, Authorization: `Bearer ${newToken}` },
           credentials: "include",
         });
-        return retryRes;
       }
     }
     return res;
@@ -141,10 +137,4 @@ export const AuthProvider = ({ children }) => {
       {children}
     </AuthContext.Provider>
   );
-};
-
-export const useAuth = () => {
-  const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error("useAuth must be used inside AuthProvider");
-  return ctx;
 };
