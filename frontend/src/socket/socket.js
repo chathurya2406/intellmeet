@@ -1,6 +1,5 @@
 import { io } from "socket.io-client";
-
-const URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
+import API_BASE_URL from "../config/api";
 
 // Socket is created lazily with the JWT token so auth works.
 // Call createSocket(token) once after login; call getSocket() anywhere else.
@@ -10,7 +9,7 @@ export const createSocket = (token) => {
   if (socketInstance) {
     socketInstance.disconnect();
   }
-  socketInstance = io(URL, {
+  socketInstance = io(API_BASE_URL, {
     transports: ["websocket"],
     auth: { token },
     autoConnect: true,
