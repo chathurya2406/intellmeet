@@ -1,0 +1,41 @@
+services:
+  # ─── Backend (Node.js Web Service) ──────────────────────────────────────────
+  - type: web
+    name: intellmeet-backend
+    runtime: node
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: node server.js
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: MONGO_URI
+        sync: false   # Set this in Render dashboard — never commit secrets
+      - key: JWT_SECRET
+        sync: false   # Set this in Render dashboard
+      - key: REFRESH_TOKEN_SECRET
+        sync: false   # Set this in Render dashboard
+      - key: JWT_EXPIRES_IN
+        value: 15m
+      - key: REFRESH_TOKEN_EXPIRES_IN
+        value: 7d
+      - key: FRONTEND_URL
+        sync: false   # Set to your Render frontend URL after deploying frontend
+
+  # ─── Frontend (Static Site) ──────────────────────────────────────────────────
+  - type: web
+    name: intellmeet-frontend
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: VITE_BACKEND_URL
+        sync: false   # Set to your Render backend URL after deploying backend
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
